@@ -1,4 +1,4 @@
-package com.apogano.foldersync;
+package com.documentshub.foldersync;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
