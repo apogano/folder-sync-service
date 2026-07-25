@@ -4,11 +4,11 @@ spring:
   datasource:
     url: jdbc:h2:file:${H2_DB_PATH:./data/scanner};AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    username: foldersync
+    password: foldersync
   jpa:
     hibernate:
-    ddl-auto: update
+      ddl-auto: update
     open-in-view: false
   h2:
     console:

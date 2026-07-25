@@ -154,4 +154,7 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
-
+data/
+*.class
+.DS_Store
+application-local.yml
