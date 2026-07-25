@@ -2,6 +2,9 @@ package com.documentshub.foldersync.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+import com.documentshub.foldersync.converter.PasswordEncryptor;
+
 import jakarta.persistence.Convert;
 
 /**

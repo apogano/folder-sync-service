@@ -1,4 +1,4 @@
-package com.documentshub.foldersync.model;
+package com.documentshub.foldersync.service;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

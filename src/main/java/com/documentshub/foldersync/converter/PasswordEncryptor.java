@@ -1,4 +1,4 @@
-package com.documentshub.foldersync.model;
+package com.documentshub.foldersync.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.documentshub.foldersync.service.EncryptionService;
 
 @Converter
 public class PasswordEncryptor implements AttributeConverter<String, String> {
