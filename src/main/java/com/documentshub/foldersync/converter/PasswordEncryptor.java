@@ -15,7 +15,7 @@ public class PasswordEncryptor implements AttributeConverter<String, String> {
 
 	//The better is to use Spring dependency injection (recommended)
 	//TODO Change it later
-    private static final String KEY = "change-it-in-production";
+    private static final String KEY = "0123456789abcdef0123456789abcdef";
 
     private static final SecretKey SECRET_KEY =
             new SecretKeySpec(KEY.getBytes(StandardCharsets.UTF_8), "AES");

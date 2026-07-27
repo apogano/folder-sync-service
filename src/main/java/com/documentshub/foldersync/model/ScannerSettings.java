@@ -41,6 +41,10 @@ public class ScannerSettings{
 		return uploadUrl;
 	}
 	
+	public void setUploadUrl(String uploadUrl) {
+		this.uploadUrl = uploadUrl;
+	}
+	
 	public String getUsername() {
 		return username;
 	}

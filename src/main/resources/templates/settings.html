@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Scanner — Settings</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+        nav a { margin-right: 1rem; }
+        h1, h2 { font-size: 1.2rem; }
+        label { display: block; margin-top: 1rem; font-weight: 600; font-size: 0.9rem; }
+        input[type=text], input[type=password], input[type=number] {
+            width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box;
+        }
+        button { padding: 0.5rem 1rem; margin-top: 1rem; cursor: pointer; }
+        .hint { color: #666; font-size: 0.8rem; margin-top: 0.25rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        td, th { padding: 0.4rem; border-bottom: 1px solid #e0e0e0; font-size: 0.9rem; }
+        .folder-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .folder-form input { flex: 1; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/settings">Settings</a>
+</nav>
+
+<h1>Settings</h1>
+
+<form th:action="@{/settings}" th:object="${settings}" method="post">
+    <label for="uploadUrl">Documents Hub URL</label>
+    <input type="text" id="uploadUrl" th:field="*{uploadUrl}" placeholder="http://localhost:8000">
+
+    <label for="username">Username</label>
+    <input type="text" id="username" th:field="*{username}">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
+    <div class="hint">For a currently-stored password, this field is intentionally left blank when the page loads -- it is never re-displayed.</div>
+
+    <label for="workerCount">Upload worker threads</label>
+    <input type="number" id="workerCount" th:field="*{workerCount}" min="1" max="20">
+    <div class="hint">How many files can upload in parallel. Takes effect immediately on save.</div>
+
+    <label for="rescanIntervalSeconds">Rescan interval (seconds)</label>
+    <input type="number" id="rescanIntervalSeconds" th:field="*{rescanIntervalSeconds}" min="10">
+    <div class="hint">How often watched folders are re-scanned for new files. Takes effect immediately on save.</div>
+
+    <button type="submit">Save settings</button>
+</form>
+
+<h2>Watched folders</h2>
+
+<table>
+    <tbody>
+    <tr th:each="folder : ${folders}">
+        <td th:text="${folder.path}"></td>
+        <td>
+            <form th:action="@{/settings/folders/{id}/delete(id=${folder.id})}" method="post">
+                <button type="submit">Remove</button>
+            </form>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(folders)}">
+        <td colspan="2">No folders configured yet.</td>
+    </tr>
+    </tbody>
+</table>
+
+<form class="folder-form" th:action="@{/settings/folders/add}" method="post">
+    <input type="text" name="path" placeholder="/path/to/folder" required>
+    <button type="submit">Add folder</button>
+</form>
+
+</body>
+</html>
