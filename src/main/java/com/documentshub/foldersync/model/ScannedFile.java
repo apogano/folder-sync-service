@@ -108,4 +108,8 @@ public class ScannedFile{
 		this.uploadedAt = Instant.now();
 		this.errorMessage = null;
 	}
+
+	public void setStatus(ScanStatus status) {
+		this.status = status;		
+	}
 }
