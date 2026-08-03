@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Scanner — Dashboard</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+        h1 { font-size: 1.4rem; }
+        nav a { margin-right: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #e0e0e0; font-size: 0.9rem; }
+        th { background: #fafafa; }
+        .status { padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .status-DISCOVERED { background: #fff3cd; color: #856404; }
+        .status-UPLOADING { background: #cfe2ff; color: #084298; }
+        .status-UPLOADED { background: #d1e7dd; color: #0f5132; }
+        .status-FAILED { background: #f8d7da; color: #842029; }
+        .checksum { font-family: monospace; font-size: 0.8rem; color: #666; }
+        button { padding: 0.4rem 0.8rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/settings">Settings</a>
+</nav>
+
+<h1>Scanned Documents</h1>
+
+<form th:action="@{/scan-now}" method="post">
+    <button type="submit">Scan now</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Folder</th>
+        <th>File</th>
+        <th>Checksum</th>
+        <th>Status</th>
+        <th>Attempts</th>
+        <th>Discovered</th>
+        <th>Uploaded</th>
+        <th>Error</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="file : ${files}">
+        <td th:text="${file.folderPath}"></td>
+        <td th:text="${file.fileName}"></td>
+        <td class="checksum" th:text="${#strings.substring(file.checksum, 0, 12)} + '…'"></td>
+        <td><span class="status" th:classappend="'status-' + ${file.status}" th:text="${file.status}"></span></td>
+        <td th:text="${file.uploadAttempts}"></td>
+        <td th:text="${file.discoveredAt}"></td>
+        <td th:text="${file.uploadedAt} ?: '—'"></td>
+        <td th:text="${file.errorMessage} ?: ''"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(files)}">
+        <td colspan="8">No files discovered yet. Add a watched folder in Settings, then click "Scan now".</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
