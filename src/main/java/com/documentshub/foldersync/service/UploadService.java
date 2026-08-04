@@ -7,6 +7,10 @@ import com.documentshub.foldersync.repository.ScannedFileRepository;
 import com.documentshub.foldersync.upload.DocumentUploadClient;
 import com.documentshub.foldersync.upload.UploadException;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +47,28 @@ public class UploadService{
 		this.executorManager = executorManager;
 	}
 	
+	@EventListener(ApplicationReadyEvent.class)
+	@Order(1)
+	public void recoverInterruptedUploads() {
+	    List<ScannedFile> stuckUploads =
+	            scannedFileRepository.findByStatus(ScanStatus.UPLOADING);
+
+	    if (stuckUploads.isEmpty()) {
+	        log.info("No interrupted uploads to recover");
+	        return;
+	    }
+
+	    for (ScannedFile file : stuckUploads) {
+	        file.setStatus(ScanStatus.DISCOVERED);
+	        file.setErrorMessage(null);
+	        scannedFileRepository.save(file);
+
+	        log.info("Recovered interrupted upload: {}", file.getFileName());
+	    }
+
+	    log.info("Recovered {} interrupted uploads", stuckUploads.size());	
+	}
+	
 	public void uploadAllDiscovered() {
 		List<ScannedFile> discovered = scannedFileRepository.findByStatus(ScanStatus.DISCOVERED);
 		for (ScannedFile file : discovered) {
@@ -57,11 +83,14 @@ public class UploadService{
 	 * avoids acting on stale state.
 	 */
 	private void uploadWithRetry(Long scannedFileId) {
+		log.info("Upload with retry started for the id:{}.",scannedFileId);
 		ScannedFile file = scannedFileRepository.findById(scannedFileId).orElse(null);
+		
 		if (file == null) {
 			return;
 		}
 		
+		log.info("Selected file to upload:{}",file.getFileName());
 		file.setStatus(ScanStatus.UPLOADING);
 		scannedFileRepository.save(file);
 		
