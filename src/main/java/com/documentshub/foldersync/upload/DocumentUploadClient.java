@@ -32,16 +32,21 @@ public class DocumentUploadClient{
 	}
 	
 	public void upload(File file) {
-		ScannerSettings settings = settingsService.getSettings();
-		RestClient client = RestClient.create(settings.getUploadUrl());
-		String token = authTokenService.getValidAccessToken();
-		
-		MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
-		body.add("file", new FileSystemResource(file));
-		
-		try {
+		try {		
+			ScannerSettings settings = settingsService.getSettings();
+	        RestClient client = RestClient.builder()
+	                .requestInterceptor((request, body, execution) -> {
+	                    return execution.execute(request, body);
+	                })
+	                .baseUrl(settings.getUploadUrl())
+	                .build();
+			String token = authTokenService.getValidAccessToken();
+			
+			MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
+			body.add("file", new FileSystemResource(file));
+
 			client.post()
-			      .uri("api/documents/upload")
+			      .uri("/api/documents/upload")
 			      .header("Authorization", "Bearer "+token)
 			      .contentType(MediaType.MULTIPART_FORM_DATA)
 			      .body(body)

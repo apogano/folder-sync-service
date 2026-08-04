@@ -3,6 +3,7 @@ package com.documentshub.foldersync.auth;
 import com.documentshub.foldersync.model.ScannerSettings;
 import com.documentshub.foldersync.service.SettingsService;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -65,26 +67,44 @@ public class AuthTokenService{
 	
 	private void login() {
         ScannerSettings settings = settingsService.getSettings();
-        RestClient client = RestClient.create(settings.getUploadUrl());
-
+        //RestClient client = RestClient.create(settings.getUploadUrl());
+        RestClient client = RestClient.builder()
+                .requestInterceptor((request, body, execution) -> {
+                    return execution.execute(request, body);
+                })
+                .baseUrl(settings.getUploadUrl())
+                .build();
+        
+        LoginRequest request = new LoginRequest(
+                settings.getUsername(),
+                settings.getPassword()
+        );
+        
         TokenResponse response = client.post()
                 .uri("/api/token/")
-                .body(Map.of("username", settings.getUsername(), "password", settings.getPassword()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
                 .retrieve()
                 .body(TokenResponse.class);
-
+        
         applyTokenResponse(response);
     }	
     
 	private void refresh() {
 		ScannerSettings settings = settingsService.getSettings();
-		RestClient client = RestClient.create(settings.getUploadUrl());
+	       RestClient client = RestClient.builder()
+	                .requestInterceptor((request, body, execution) -> {
+	                    return execution.execute(request, body);
+	                })
+	                .baseUrl(settings.getUploadUrl())
+	                .build();
 		
 		TokenResponse response = client.post()
-				.uri("api/token/refresh")
+				.uri("/api/token/refresh/")
 				.body(Map.of("refresh",refreshToken))
 				.retrieve()
 				.body(TokenResponse.class);
+		System.out.println(response);
 		this.accessToken = response.access();
 		this.refreshToken = response.refresh();
 	}
