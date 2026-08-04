@@ -49,4 +49,18 @@ public class SettingsController {
 
         return "redirect:/settings";
     }    
+    
+    @PostMapping("/settings/folders/add")
+    public String addFolder(@RequestParam String path) {
+        if (path != null && !path.isBlank() && watchedFolderRepository.findByPath(path).isEmpty()) {
+            watchedFolderRepository.save(new WatchedFolder(path));
+        }
+        return "redirect:/settings";
+    }    
+    
+    @PostMapping("/settings/folders/{id}/delete")
+    public String deleteFolder(@PathVariable Long id) {
+        watchedFolderRepository.deleteById(id);
+        return "redirect:/settings";
+    }    
 }
