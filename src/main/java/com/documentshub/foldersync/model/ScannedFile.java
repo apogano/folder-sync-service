@@ -95,7 +95,7 @@ public class ScannedFile{
 		this.errorMessage = errorMessage;
 	}
 	
-	public Instant getDiscoverdAt() {
+	public Instant getDiscoveredAt() {
 		return discoveredAt;
 	}
 	
