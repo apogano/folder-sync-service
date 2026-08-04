@@ -1,6 +1,10 @@
 package com.documentshub.foldersync.service;
 
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+
+import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +49,21 @@ public class RescanSchedulerService{
 		this.taskScheduler.setThreadNamePrefix("rescan-scheduler-");
 	}
 	
-	@PostConstruct
+	@EventListener(ApplicationReadyEvent.class)
+	@Order(2)
 	public void start() {
 		taskScheduler.initialize();
 		reschedule(settingsService.getSettings().getRescanIntervalSeconds());
+		log.info("Scheduler started");
+	}
+	
+	@PreDestroy
+	public void stop() {
+	    if (currentSchedule != null) {
+	        currentSchedule.cancel(true);
+	    }
+	    taskScheduler.shutdown();
+	    log.info("Scheduler stopped");
 	}
 	
     /**
@@ -66,6 +81,8 @@ public class RescanSchedulerService{
     }	
 
     private void runCycle() {
+        log.info("Running scan cycle on thread {}", Thread.currentThread().getName());
+    	
         try {
             folderScannerService.scanAll();
             uploadService.uploadAllDiscovered();
@@ -81,6 +98,6 @@ public class RescanSchedulerService{
     public void runNow() {
         taskScheduler.execute(this::runCycle);
     }
-	
+
 	
 }
