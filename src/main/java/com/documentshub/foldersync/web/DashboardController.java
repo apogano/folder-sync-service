@@ -1,11 +1,16 @@
 package com.documentshub.foldersync.web;
 
+import com.documentshub.foldersync.model.ScanStatus;
+import com.documentshub.foldersync.model.ScannedFile;
 import com.documentshub.foldersync.repository.ScannedFileRepository;
 import com.documentshub.foldersync.service.RescanSchedulerService;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -32,4 +37,16 @@ public class DashboardController{
 		rescanSchedulerService.runNow();
 		return "redirect:/";
 	}
+	
+    @PostMapping("/{id}/mark-as-discovered")
+    public String markAsDiscovered(@PathVariable Long id) {
+    	ScannedFile scannedFile = scannedFileRepository.findById(id).orElse(null);
+    	scannedFile.setStatus(ScanStatus.DISCOVERED);
+    	scannedFile.setErrorMessage(null);
+        scannedFileRepository.save(scannedFile);
+        return "redirect:/";
+    } 	
+	
+	
+	
 }

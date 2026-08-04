@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Document Scanner — Dashboard</title>
     <style>
-        body { font-family: -apple-system, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+        body { font-family: -apple-system, sans-serif; max-width: 1100px; padding: 0 1rem; color: #1a1a1a; }
         h1 { font-size: 1.4rem; }
         nav a { margin-right: 1rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
@@ -42,6 +42,7 @@
         <th>Discovered</th>
         <th>Uploaded</th>
         <th>Error</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -54,6 +55,11 @@
         <td th:text="${file.discoveredAt}"></td>
         <td th:text="${file.uploadedAt} ?: '—'"></td>
         <td th:text="${file.errorMessage} ?: ''"></td>
+        <td>
+            <form th:action="@{{id}/mark-as-discovered(id=${file.id})}" method="post">
+                <button type="submit">Mark as discovered</button>
+            </form>
+        </td>
     </tr>
     <tr th:if="${#lists.isEmpty(files)}">
         <td colspan="8">No files discovered yet. Add a watched folder in Settings, then click "Scan now".</td>
