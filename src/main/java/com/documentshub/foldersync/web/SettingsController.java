@@ -4,6 +4,8 @@ import com.documentshub.foldersync.model.ScannerSettings;
 import com.documentshub.foldersync.model.WatchedFolder;
 import com.documentshub.foldersync.repository.WatchedFolderRepository;
 import com.documentshub.foldersync.service.SettingsService;
+import com.documentshub.foldersync.service.UploadExecutorManager;
+import com.documentshub.foldersync.service.RescanSchedulerService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,12 +21,18 @@ public class SettingsController {
 
     private final SettingsService settingsService;
     private final WatchedFolderRepository watchedFolderRepository;
+    private final UploadExecutorManager executorManager;
+    private final RescanSchedulerService rescanSchedulerService;    
     
     public SettingsController(SettingsService settingsService,
-                               WatchedFolderRepository watchedFolderRepository
+                               WatchedFolderRepository watchedFolderRepository,
+                               UploadExecutorManager executorManager,
+                               RescanSchedulerService rescanSchedulerService
     	) {
         this.settingsService = settingsService;
         this.watchedFolderRepository = watchedFolderRepository;
+        this.executorManager = executorManager;
+        this.rescanSchedulerService = rescanSchedulerService;
     }
     
     @GetMapping("/settings")
@@ -47,6 +55,10 @@ public class SettingsController {
         settings.setRescanIntervalSeconds(formSettings.getRescanIntervalSeconds());
         settingsService.save(settings);
 
+        // Apply the two "live" settings immediately rather than waiting
+        // for a restart.
+        executorManager.resize(settings.getWorkerCount());
+        rescanSchedulerService.reschedule(settings.getRescanIntervalSeconds());
         return "redirect:/settings";
     }    
     

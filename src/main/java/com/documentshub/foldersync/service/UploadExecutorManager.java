@@ -31,10 +31,24 @@ public class UploadExecutorManager{
 		executor.initialize();
 	}
 	
+	/**
+	 * Resizes the upload worker pool at runtime without restarting the application.
+	 * The order of updating max and core pool sizes matters because ThreadPoolExecutor
+	 * requires corePoolSize to never exceed maxPoolSize. When increasing the pool,
+	 * max size must be updated first; when decreasing it, core size must be reduced first.
+	 */
 	public void resize(int workerCount) {
 		int safeCount = Math.max(1, workerCount);
-		executor.setCorePoolSize(safeCount);
-		executor.setMaxPoolSize(safeCount);
+		int currentMax = executor.getMaxPoolSize();
+		if (safeCount > currentMax) {
+			executor.setMaxPoolSize(safeCount);	
+			executor.setCorePoolSize(safeCount);
+		}
+		else {
+	        executor.setCorePoolSize(safeCount);
+	        executor.setMaxPoolSize(safeCount);	
+		}
+		
 		log.info("Upload worker pool resized to {}",safeCount);
 	}
 	
