@@ -99,7 +99,7 @@ public class AuthTokenService{
 				.body(Map.of("refresh",refreshToken))
 				.retrieve()
 				.body(TokenResponse.class);
-		System.out.println(response);
+
 		this.accessToken = response.access();
 		this.refreshToken = response.refresh();
 	}
