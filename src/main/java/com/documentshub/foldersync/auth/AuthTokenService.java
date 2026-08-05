@@ -7,12 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,12 +33,15 @@ public class AuthTokenService{
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
+	private final RestClient.Builder restClientBuilder;
+	
 	private volatile String accessToken;
 	private volatile String refreshToken;
 	private volatile Instant accessTokenExpiresAt = Instant.EPOCH;
 	
-	public AuthTokenService(SettingsService settingsService) {
+	public AuthTokenService(SettingsService settingsService, RestClient.Builder restClientBuilder) {
 		this.settingsService = settingsService;
+		this.restClientBuilder = restClientBuilder;
 	}
 	
 	/**
@@ -67,21 +69,17 @@ public class AuthTokenService{
 	
 	private void login() {
         ScannerSettings settings = settingsService.getSettings();
-        //RestClient client = RestClient.create(settings.getUploadUrl());
-        RestClient client = RestClient.builder()
-                .requestInterceptor((request, body, execution) -> {
-                    return execution.execute(request, body);
-                })
+        RestClient client = restClientBuilder
                 .baseUrl(settings.getUploadUrl())
-                .build();
-        
+                .build();        
+
         LoginRequest request = new LoginRequest(
                 settings.getUsername(),
                 settings.getPassword()
         );
         
         TokenResponse response = client.post()
-                .uri("/api/token/")
+                .uri(settings.getUploadUrl() + "/api/token/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
@@ -92,12 +90,9 @@ public class AuthTokenService{
     
 	private void refresh() {
 		ScannerSettings settings = settingsService.getSettings();
-	       RestClient client = RestClient.builder()
-	                .requestInterceptor((request, body, execution) -> {
-	                    return execution.execute(request, body);
-	                })
-	                .baseUrl(settings.getUploadUrl())
-	                .build();
+        RestClient client = restClientBuilder
+                .baseUrl(settings.getUploadUrl())
+                .build();  
 		
 		TokenResponse response = client.post()
 				.uri("/api/token/refresh/")

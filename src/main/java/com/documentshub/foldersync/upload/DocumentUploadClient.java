@@ -26,20 +26,22 @@ public class DocumentUploadClient{
 	
 	private final AuthTokenService authTokenService;
 	
-	public DocumentUploadClient(SettingsService settingsService, AuthTokenService authTokenService) {
+	private final RestClient.Builder restClientBuilder;
+	
+	public DocumentUploadClient(SettingsService settingsService, AuthTokenService authTokenService,
+			RestClient.Builder restClientBuilder ) {
 		this.settingsService = settingsService;
 		this.authTokenService = authTokenService;
+		this.restClientBuilder = restClientBuilder;
 	}
 	
 	public void upload(File file) {
 		try {		
 			ScannerSettings settings = settingsService.getSettings();
-	        RestClient client = RestClient.builder()
-	                .requestInterceptor((request, body, execution) -> {
-	                    return execution.execute(request, body);
-	                })
+	        RestClient client = restClientBuilder
 	                .baseUrl(settings.getUploadUrl())
-	                .build();
+	                .build();  
+	        
 			String token = authTokenService.getValidAccessToken();
 			
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
