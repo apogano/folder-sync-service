@@ -5,8 +5,6 @@ import com.documentshub.foldersync.model.ScannedFile;
 import com.documentshub.foldersync.repository.ScannedFileRepository;
 import com.documentshub.foldersync.service.RescanSchedulerService;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

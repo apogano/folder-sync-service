@@ -1,6 +1,5 @@
 package com.documentshub.foldersync.service;
 
-import com.documentshub.foldersync.model.ScannerSettings;
 import com.documentshub.foldersync.model.ScanStatus;
 import com.documentshub.foldersync.model.ScannedFile;
 import com.documentshub.foldersync.repository.ScannedFileRepository;
