@@ -101,7 +101,10 @@ public class AuthTokenService{
 				.body(TokenResponse.class);
 
 		this.accessToken = response.access();
-		this.refreshToken = response.refresh();
+		this.accessTokenExpiresAt = extractExpiry(response.access());
+		if (response.refresh() != null) {
+			this.refreshToken = response.refresh();
+		}
 	}
 	
 	private void applyTokenResponse(TokenResponse response) {
