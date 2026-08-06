@@ -62,6 +62,11 @@ java -jar target/folder-sync-service-0.0.1-SNAPSHOT.jar
 
 The app starts on `http://localhost:8081` (configurable via `SERVER_PORT`). On first run, an H2 database file is created at `./data/scanner` (file-based, not in-memory — settings and scan history survive a restart).
 
+Set `SCANNER_ENCRYPTION_KEY` before storing any real credentials — this encrypts the Documents Hub password at rest. Without it, the app still runs (falls back to a hardcoded development-only key, with a warning logged), which is fine for trying the app out locally but not for anything real:
+```bash
+export SCANNER_ENCRYPTION_KEY=$(openssl rand -base64 32)
+```
+
 Open `http://localhost:8081/settings` first to configure:
 - **Documents Hub URL** (e.g. `http://localhost:8000`)
 - **Username / password** — a real Documents Hub user account, since uploads require a JWT session.
@@ -101,6 +106,7 @@ All operational parameters can be changed without restarting the service, includ
 - **A manually-managed `ThreadPoolTaskScheduler`** for the rescan interval, instead of `@Scheduled(fixedRate=...)`. The declarative annotation is evaluated once at startup from a static property and can't be changed afterward; scheduling imperatively and keeping a handle to the current `ScheduledFuture` allows cancelling and rescheduling whenever the interval changes in settings.
 - **JWTs are decoded directly to read the real `exp` claim**, rather than assuming/hardcoding a token lifetime — keeps the scanner's refresh timing accurate even if the server's token lifetime configuration changes.
 - **The settings form never re-displays the stored password.** The field is always rendered blank; submitting it blank leaves the stored password untouched, submitting a value replaces it. Avoids ever putting a real credential back into rendered HTML.
+- **The stored password is encrypted at rest** (AES-GCM, random IV per encryption) via a JPA `AttributeConverter`. The encryption key is sourced from the `SCANNER_ENCRYPTION_KEY` environment variable, read directly (`System.getenv()`) rather than through Spring dependency injection. If the environment variable isn't set, it falls back to a hardcoded development-only key and logs a loud warning — functional for local dev, but must be set before storing any real credentials.
 - **Centralized HTTP client configuration.** All communication with Documents Hub goes through a shared RestClient builder configuration, keeping authentication and upload requests consistent and allowing HTTP behaviour to be configured in one place.
 
 ## Known limitations
