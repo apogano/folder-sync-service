@@ -20,7 +20,7 @@ spring:
 
 logging:
   level:
-    com.documentshub.scanner: INFO
+    com.documentshub.foldersync: INFO
 
 server:
   port: ${SERVER_PORT:8081}

@@ -113,14 +113,14 @@ public class AuthTokenService{
 	/**
 	 * JWTs are self-describing: the payload (middle segment) carries an 
 	 * "exp" claim. Decoding it directly means we track the *actual* expiry 
-	 * the server set, rather than quessing a token lifetime that could drift out
-	 * of sync with server config.
+	 * the server set, rather than guessing a token lifetime that could drift out
+	 * of sync with server configuration.
 	 * @param jwt
 	 * @return
 	 */
 	private Instant extractExpiry(String jwt) {
 		try {
-			String[] parts = jwt.split("\\,");
+			String[] parts = jwt.split("\\.");
 			String payloadJson = new String(
 				Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8	
 			);
@@ -129,7 +129,7 @@ public class AuthTokenService{
 			return Instant.ofEpochSecond(expEpochSeconds);					
 		}
 		catch (Exception e) {
-			// If the token can't be parsed for any reason, treat is as
+			// If the token can't be parsed for any reason, treat it as
 			// already expired. Then a fresh login is forced rather than silently 
 			// trusting a token we couldn't verify.
 			return Instant.EPOCH;

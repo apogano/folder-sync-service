@@ -38,10 +38,12 @@ public class DashboardController{
 	
     @PostMapping("/{id}/mark-as-discovered")
     public String markAsDiscovered(@PathVariable Long id) {
-    	ScannedFile scannedFile = scannedFileRepository.findById(id).orElse(null);
-    	scannedFile.setStatus(ScanStatus.DISCOVERED);
-    	scannedFile.setErrorMessage(null);
-        scannedFileRepository.save(scannedFile);
+        scannedFileRepository.findById(id)
+          .ifPresent(scannedFile -> {
+			scannedFile.setStatus(ScanStatus.DISCOVERED);
+			scannedFile.setErrorMessage(null);
+			scannedFileRepository.save(scannedFile);
+		  });
         return "redirect:/";
     } 	
 	
