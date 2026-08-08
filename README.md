@@ -1,6 +1,6 @@
 # Folder Sync Service
 
-A lightweight configurable document ingestion agent that scans configured folders for files, and uploads newly discovered ones to [Documents Hub](../documents-hub) — the companion Django service that extracts and indexes their content for search.
+A lightweight configurable document ingestion agent that scans configured folders for files, and uploads newly discovered ones to [Documents Hub](https://github.com/apogano/documents-hub) — the companion Django service that extracts and indexes their content for search.
 
 Everything is configurable at runtime from a browser-based dashboard: no config file edits or restarts needed to change watched folders, credentials, worker count, or scan frequency.
 
